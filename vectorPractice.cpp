@@ -23,26 +23,26 @@
 
 
 // int main() {
-// 	glm::vec3 vectorA = glm::vec3(4.0,5.0,7.0);
-// 	glm::vec3 vectorB = glm::vec3(9.0,13.0,11.0);
-// 	glm::vec3 vectorS = glm::vec3(6.0,15.0,16.0);
-// 	glm::vec3 vectorP = glm::vec3(17.0,10.0,14.0);
+// 	glm::vec3 vectorA = glm::vec3(3.0,9.0,3.0);
+// 	glm::vec3 vectorB = glm::vec3(0.0,0.0,4.0);
+// 	glm::vec3 vectorS = glm::vec3(12.0,0.0,5.0);
+// 	glm::vec3 vectorP = glm::vec3(5.0,3.0,3.0);
 
 
 // /*finished*/
-// 	// fprintf( stderr, "What part of A lives in B dir = (%6.2f,%6.2f,%6.2f)\n", WhatPartOfALivesInBDir(vectorA, vectorB).x, WhatPartOfALivesInBDir(vectorA, vectorB).y, WhatPartOfALivesInBDir(vectorA, vectorB).z );
-// 	// fprintf( stderr, "What part of A lives perp to B  = (%6.2f,%6.2f,%6.2f)\n", WhatPartOfALivesPerpToB(vectorA, vectorB).x, WhatPartOfALivesPerpToB(vectorA, vectorB).y, WhatPartOfALivesPerpToB(vectorA, vectorB).z );
-// 	// fprintf( stderr, "Unit surface = (%6.2f,%6.2f,%6.2f)\n", UnitSurfaceNormal(vectorA, vectorB, vectorS).x, UnitSurfaceNormal(vectorA, vectorB, vectorS).y, UnitSurfaceNormal(vectorA, vectorB, vectorS).z );
-// 	// fprintf( stderr, "Area = (%6.2f)\n", Area(vectorA, vectorB, vectorS));
-// 	// fprintf( stderr, "is point in triangle = (%6.2f)\n", IsPointInTriangle(vectorA, vectorB, vectorS, vectorP));
-// 	// fprintf( stderr, "distance from point to plane = (%6.2f)\n", DistanceFromPointToPlane(vectorA, vectorB, vectorS, vectorP));
+// 	fprintf( stderr, "What part of A lives in B dir = (%6.2f,%6.2f,%6.2f)\n", WhatPartOfALivesInBDir(vectorA, vectorB).x, WhatPartOfALivesInBDir(vectorA, vectorB).y, WhatPartOfALivesInBDir(vectorA, vectorB).z );
+// 	fprintf( stderr, "What part of A lives perp to B  = (%6.2f,%6.2f,%6.2f)\n", WhatPartOfALivesPerpToB(vectorA, vectorB).x, WhatPartOfALivesPerpToB(vectorA, vectorB).y, WhatPartOfALivesPerpToB(vectorA, vectorB).z );
+// 	fprintf( stderr, "Unit surface = (%6.2f,%6.2f,%6.2f)\n", UnitSurfaceNormal(vectorA, vectorB, vectorS).x, UnitSurfaceNormal(vectorA, vectorB, vectorS).y, UnitSurfaceNormal(vectorA, vectorB, vectorS).z );
+// 	fprintf( stderr, "Area = (%6.2f)\n", Area(vectorA, vectorB, vectorS));
+// 	fprintf( stderr, "is point in triangle = (%6.2f)\n", IsPointInTriangle(vectorA, vectorB, vectorS, vectorP));
+// 	fprintf( stderr, "distance from point to plane = (%6.2f)\n", DistanceFromPointToPlane(vectorA, vectorB, vectorS, vectorP));
 
-// 	// WhatPartOfALivesInBDir(vectorA, vectorB);
-// 	// WhatPartOfALivesPerpToB(vectorA, vectorB);
-// 	// UnitSurfaceNormal(vectorA, vectorB, vectorS);
-// 	// Area(vectorA, vectorB, vectorS);
-// 	// DistanceFromPointToPlane(vectorA, vectorB, vectorS, vectorP);
-// 	// IsPointInTriangle(vectorA, vectorB, vectorS, vectorP);
+// // 	// WhatPartOfALivesInBDir(vectorA, vectorB);
+// // 	// WhatPartOfALivesPerpToB(vectorA, vectorB);
+// // 	// UnitSurfaceNormal(vectorA, vectorB, vectorS);
+// // 	// Area(vectorA, vectorB, vectorS);
+// // 	// DistanceFromPointToPlane(vectorA, vectorB, vectorS, vectorP);
+// // 	// IsPointInTriangle(vectorA, vectorB, vectorS, vectorP);
 
 // 	return 0;
 // }
@@ -57,8 +57,9 @@ glm::vec3 WhatPartOfALivesInBDir(glm::vec3 a, glm::vec3 b) {
 	glm::vec3 bUnitVec = glm::vec3(0.0, 0.0, 0.0);
 
 	bUnitVec = glm::normalize(b);
+	dotResult = glm::dot(a, bUnitVec);
 
-	return cross(bUnitVec,(glm::cross(a, bUnitVec)));
+	return bUnitVec * dotResult;
 }
 
 glm::vec3 WhatPartOfALivesPerpToB(glm::vec3 a, glm::vec3 b) {
@@ -73,7 +74,7 @@ glm::vec3 WhatPartOfALivesPerpToB(glm::vec3 a, glm::vec3 b) {
 
 glm::vec3 UnitSurfaceNormal(glm::vec3 q, glm::vec3 r, glm::vec3 s) {
 	//n = (r-q) x (s-q)
-	return glm::cross(r-q, s-q);
+	return glm::normalize(glm::cross(r-q, s-q));
 }
 
 float Area(glm::vec3 q, glm::vec3 r, glm::vec3 s) {
@@ -81,7 +82,7 @@ float Area(glm::vec3 q, glm::vec3 r, glm::vec3 s) {
 	then calculate the magnitude of this vector and divide by 2*/
 	glm::vec3 xproduct = glm::vec3(0.0,0.0,0.0);
 	float mag = 0.0;
-	xproduct = UnitSurfaceNormal(q,r,s);
+	xproduct = cross(r-q, s-q);
 
 	//calculate the magnitude of the cross product
 	for(int i = 0; i < 3/*length(b)*/; i++) {
@@ -107,7 +108,6 @@ bool IsPointInTriangle(glm::vec3 q, glm::vec3 r, glm::vec3 s, glm::vec3 p) {
 	hasNeg = (RToS < 0 || SToQ < 0 || QToR < 0);
 	hasPos = (RToS > 0 || SToQ > 0 || QToR > 0);
 
-	std::cout<<"is point in triangle: "<<!(hasNeg && hasPos)<<std::endl;
 	return !(hasNeg && hasPos);
 }
 
@@ -116,11 +116,7 @@ float DistanceFromPointToPlane(glm::vec3 q, glm::vec3 r, glm::vec3 s, glm::vec3 
 	then find the unit vector of n */
 
 	glm::vec3 n = UnitSurfaceNormal(q, r, s);
-	glm::vec3 nUnitVec = glm::vec3(0.0,0.0,0.0);
-
-	nUnitVec = glm::normalize(n);
-
-	return dot((p-q),nUnitVec);	
+	return dot((p-q),n);	
 }
 
 void WhoAmI(std::string &yourName, std::string &yourEmailAddress) {
